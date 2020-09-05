@@ -16,20 +16,24 @@ Todo App V2 is made with Vue & Laravel APIs combined in one project file.
 
 Todo App V2 requires [Node.js] , [composer] and [laravel]
 
-Install the dependencies and devDependencies and run watch to access the vue modules.
+Install the composer dependencies.
+
+```sh
+$ composer install
+$ php artisan key:generate
+$ php artisan serve
+```
+
+
+In another terminal, install the dependencies and devDependencies and run watch to access the vue modules.
 
 ```sh
 $ npm install
 $ npm run watch
 ```
 
-Also run in another terminal to start the server.
 
-```sh
-$ php artisan serve
-```
-
-Navigating to your localhost address in your preferred browser.
+Go to your localhost address in your preferred browser.
 
 ```sh
 localhost:8000

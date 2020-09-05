@@ -35,8 +35,8 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 export default {
     data() {
          return {
-             email: 'q@q.com',
-             password: '123456',
+             email: '',
+             password: '',
              show: false,
              userprofile: null,
              projectlist: [],
