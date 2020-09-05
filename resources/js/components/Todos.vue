@@ -163,10 +163,13 @@ export default {
             try {
                 if(this.getProfile.user.isMember == 1){
                     let projects = projects_list.filter(a=>{
-                        let members = a.member_id.split(',')
-                        if(lodash.includes(members,id.toString())){
-                            return a
+                        if(a.member_id !== null) {
+                            let members = a.member_id.split(',')
+                            if(lodash.includes(members,id.toString())){
+                                return a
+                            }
                         }
+
                     })[0]
                     console.log(projects,'s')
                     await this.SaveProjectToState(projects)                    

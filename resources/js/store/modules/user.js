@@ -1,10 +1,17 @@
 import { USER_REQUEST, USER_ERROR, USER_SUCCESS } from "../actions/user";
-import apiCall from "../utils/api";
 import Vue from "vue";
 import { AUTH_LOGOUT } from "../actions/auth";
 import axios from 'axios'
 
-const state = { status: "", profile: null, token: localStorage.getItem("user-token") || "", };
+const getDefaultState = () => {
+  return {
+    status: "", 
+    profile: null, 
+    token: localStorage.getItem("user-token") || "",
+  }
+}
+
+const state = getDefaultState();
 
 const getters = {
   getProfile: state => state.profile,
@@ -31,6 +38,9 @@ const actions = {
         // if resp is unauthorized, logout, to
         dispatch(AUTH_LOGOUT);
       });
+  },
+  GO_RESET({commit}){
+    commit('resetState')
   }
 };
 
@@ -47,6 +57,9 @@ const mutations = {
   },
   [AUTH_LOGOUT]: state => {
     state.profile = null;
+  },
+  resetState (state) {
+    Object.assign(state, getDefaultState())
   }
 };
 

@@ -16,7 +16,7 @@ Todo App V2 is made with Vue & Laravel APIs combined in one project file.
 
 Todo App V2 requires [Node.js] , [composer] and [laravel]
 
-Install the composer dependencies.
+Go to project directory and Install the composer dependencies using the terminal.
 
 ```sh
 $ composer install
@@ -57,5 +57,10 @@ As much as possible, I tried to have my code simple and have it modular by using
 
 
 ----
+#### Few Notes
+  - You may have to refresh the pages multiple times every time you login. 
+  - Thank you and have a great day :) 
+
+
 
 Cholo Miguel Del Rosario

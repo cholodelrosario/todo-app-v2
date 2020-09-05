@@ -1,11 +1,15 @@
 import axios from 'axios';
 import lodash from 'lodash';
 
-const state = {
-    project: null,
-    projects: [],
-    exist: false,
-};
+const getDefaultState = () => {
+    return {
+        project: null,
+        projects: [],
+        exist: false,
+    }
+}
+
+const state = getDefaultState();
 
 const getters = {
     getProject: (state) => state.project,
@@ -24,6 +28,9 @@ const actions = {
     },
     CheckIfProjectExist({commit},exist){
         commit('setExistState', exist)
+    },
+    GO_RESETPROJECT({commit}){
+        commit('resetState')
     }
 
 };
@@ -32,7 +39,9 @@ const mutations = {
     setProject: (state,project) => {state.project = project},
     setProjectList: (state,projects) => {state.projects = projects},
     setExistState: (state,exist) => {state.exist = exist},
-
+    resetState (state) {
+        Object.assign(state, getDefaultState())
+    }
 };
 
 export default {

@@ -8,7 +8,7 @@
             <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav v-if="returnName">
                 <b-nav-item to="/todolist">Todo List</b-nav-item>
-                <b-nav-item to="/projectboard" disabled>Project Board</b-nav-item>
+                <!-- <b-nav-item to="/projectboard" disabled>Project Board</b-nav-item> -->
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->
@@ -47,10 +47,17 @@ export default {
         }
     },
     methods: {
-        logout: function () {
-            this.$store.dispatch(AUTH_LOGOUT)
-            .then(() => {
-            this.$router.push('/login')
+        ...mapActions(['GO_RESET','GO_RESETPROJECT']),
+        logout: async function () {
+            await this.$store.dispatch(AUTH_LOGOUT)
+            .then((ress) => {
+                console.log(ress,'AUTH_LOGOUT')
+                if(localStorage.getItem("user-token") !== null){
+                    localStorage.removeItem("user-token")
+                }
+                this.GO_RESET()
+                this.GO_RESETPROJECT()
+                this.$router.push('/login')
             })
         }
     },

@@ -38,6 +38,12 @@ export default {
              show: false,
          }
     },
+    created(){
+        if(localStorage.getItem("user-token") !== null){
+            localStorage.removeItem("user-token")
+        }
+        this.doToast('info', 'Please refresh the page, after logout.' , 'Important')
+    },
     methods: {
         doToast(variant = null,message = '',title='',to = null,) {
             this.$bvToast.toast(message, {

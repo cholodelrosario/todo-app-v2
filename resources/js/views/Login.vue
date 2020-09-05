@@ -35,8 +35,8 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 export default {
     data() {
          return {
-             email: '',
-             password: '',
+             email: 'sample@email.com',
+             password: '123456',
              show: false,
              userprofile: null,
              projectlist: [],
@@ -46,9 +46,14 @@ export default {
     computed: {
         ...mapGetters(['getProfile'])
     },
+    created(){ 
+        if(localStorage.getItem("user-token") !== null){
+            localStorage.removeItem("user-token")
+        }
+        this.doToast('info', 'Please refresh the page, after logout.' , 'Important')
+    },
     methods: {
         ...mapActions(['SaveProjectToState','CheckIfProjectExist','fetchProjects']),
-
         onSubmit(e){
             e.preventDefault();
             this.login()
@@ -59,9 +64,12 @@ export default {
             try {
                 console.log({email,password},'asd')
                 await this.$store.dispatch(AUTH_REQUEST, { email, password })
-                .then(() => {
-                    console.log('finished dispatch')
-                    setTimeout(() => this.getProjectList(), 3000);
+                .then((res) => {
+                    console.log(res,'finished dispatch')
+                    this.token = res.data.token
+                    console.log(this.token,'GOTCHA TOKEN')
+                    localStorage.setItem("user-token", res.data.token);
+                    setTimeout(() => this.getProjectList(), 1000);
                     // this.$router.push('/startproject')
                 }).catch(err=>{
                     console.log(err,'login')
@@ -83,7 +91,7 @@ export default {
                     console.log(resp,'data projects')
                     this.projectlist = resp.data
                     // this.fetchProjects()
-                    setTimeout(() => this.getUser(), 3000);
+                    setTimeout(() => this.getUser(), 1000);
                 }).catch(error=>{
                     console.log(error,'getProjectList')
                     this.doToast('danger','Please refresh and try again.','Login Error')
@@ -106,9 +114,10 @@ export default {
             })
             .then(resp => {
                 console.log(resp,'data user')
-                this.userprofile = resp.data.user
+                this.userprofile = resp.data
+                console.log(resp.data.user, 'USER_PROFILE')
                 // this.$store.dispatch(USER_REQUEST)
-                setTimeout(() =>this.checkIfProjectIsAvailable(), 3000);
+                setTimeout(() =>this.checkIfProjectIsAvailable(), 2000);
             }).catch(error =>{
                 console.log(error,'getUser')
                 this.doToast('danger','Please refresh and try again.','Login Error')
@@ -119,58 +128,64 @@ export default {
             try {
                 let projects = this.projectlist
                 console.log('got projects',projects)
-                if(this.getProfile.user.isMember == 1 || this.userprofile.isMember == 1){
-                    let id = this.getProfile.user.id
-                    try {
-                        if(id){
-                            let project = projects.filter(a=>{
-                                let members = a.member_id.split(',')
-                                console.log(members,'memberidarray')
-                                if(lodash.includes(members,id.toString())){
-                                    return a
+                if(this.userprofile !== null){
+                    if(this.userprofile.user.isMember == 1){
+                        let id = this.userprofile.user.id
+                        try {
+                            if(id){
+                                let project = projects.filter(a=>{
+                                    if(a.member_id !== null){
+                                        let members = a.member_id.split(',')
+                                        console.log(members,'memberidarray')
+                                        if(lodash.includes(members,id.toString())){
+                                            return a
+                                        }
+                                    }
+                                })[0]
+                                
+                                console.log(project,'project')
+                                if(project !== undefined){
+                                    await this.CheckIfProjectExist(true)
+                                    this.show = false
+                                    this.$router.push('/todolist')
+                                } else {
+                                    this.show = false
+                                    this.doToast('warning', 'Please refresh the page' , 'Login Error')
                                 }
-                            })[0]
-                            
-                            console.log(project,'project')
-                            if(project !== undefined){
-                                await this.CheckIfProjectExist(true)
-                                this.show = false
-                                this.$router.push('/todolist')
-                            } else {
-                                this.show = false
-                                this.doToast('warning', 'Please refresh the page' , 'Login Error')
-                            }
 
-                        } else {
+                            } else {
+                                return false
+                            }                
+                        } catch (error) {
+                            console.log(error,'member err')
+                            this.doToast('warning', 'Please refresh the page' , 'Login Error')
                             return false
                         }                
-                    } catch (error) {
-                        console.log(error,'member err')
-                        this.doToast('warning', 'Please refresh the page' , 'Login Error')
-                        return false
-                    }                
-                } else {                
+                    } else {                
 
-                    let owner_id = this.getProfile.user.id
-                    console.log('got id',owner_id)
-                    let index = lodash.findIndex(projects,a=>{
-                        return a.owner_id == owner_id
-                    })
+                        let owner_id = this.userprofile.user.id
+                        console.log('got id',owner_id)
+                        let index = lodash.findIndex(projects,a=>{
+                            return a.owner_id == owner_id
+                        })
 
-                    let exist = false
-                    if(index > -1){
-                        exist = true
-                    }
+                        let exist = false
+                        if(index > -1){
+                            exist = true
+                        }
 
-                    await this.CheckIfProjectExist(exist)
-                    if(exist){
-                        this.show = false
-                        this.$router.push('/todolist')
-                    } else {
-                        this.show = false
-                        this.$router.push('/startproject')
-                    }    
-                }            
+                        await this.CheckIfProjectExist(exist)
+                        if(exist){
+                            this.show = false
+                            this.$router.push('/todolist')
+                        } else {
+                            this.show = false
+                            this.$router.push('/startproject')
+                        }    
+                    }   
+                }
+
+         
             } catch (error) {
                 console.log(error,'checkIfProjectIsAvailable')
                 this.doToast('danger','Please refresh and try again.','Login Error')

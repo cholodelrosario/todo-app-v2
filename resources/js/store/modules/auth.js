@@ -5,7 +5,6 @@ import {
     AUTH_LOGOUT
   } from "../actions/auth";
   import { USER_REQUEST } from "../actions/user";
-  import apiCall from "../utils/api";
   import axios from 'axios'
   
   const state = {
@@ -27,6 +26,7 @@ import {
           .then(resp => {
             console.log(resp,'resp AUTHREQUEST')
             localStorage.setItem("user-token", resp.data.token);
+            
             // Here set the header of your ajax library to the token value.
             // example with axios
             // axios.defaults.headers.common['Authorization'] = resp.token
@@ -35,7 +35,7 @@ import {
             resolve(resp);
           })
           .catch(err => {
-            console.log(error,'error')
+            console.log(err,'error')
             commit(AUTH_ERROR, err);
             localStorage.removeItem("user-token");
             reject(err);
@@ -45,7 +45,7 @@ import {
     [AUTH_LOGOUT]: ({ commit }) => {
       return new Promise(resolve => {
         commit(AUTH_LOGOUT);
-        commit(USER_REQUEST);
+        // commit(USER_REQUEST);
         localStorage.removeItem("user-token");
         resolve();
       });

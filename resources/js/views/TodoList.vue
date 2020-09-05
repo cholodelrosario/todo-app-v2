@@ -1,7 +1,8 @@
 <template>
     <b-container class="align-center p-4 todo-container" fluid="md">
+        <div>
         <div v-if="isEdit == false">
-            <h1 class="text-info mt-4 edit-text" v-show="returnCurrentProject" @dblclick="isEdit = true">{{returnCurrentProject.title}}</h1>
+            <h1 class="text-info mt-4 edit-text" v-show="returnCurrentProject"  @dblclick="isEdit = true">{{returnCurrentProject.title}}</h1>
         </div>
         <b-form-textarea v-else size="md" v-model="returnCurrentProject.title" class="form-control mb-2" @keyup.enter="onEnterList" autofocus/> 
         <b-button 
@@ -12,12 +13,14 @@
         >
         Copy Project ID
         </b-button>
+        </div>
         <AddTodo/>
         <Todos/>
     </b-container>
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { USER_REQUEST } from "../store/actions/user";
 import Todos from '../components/Todos'
 import AddTodo from '../components/AddTodo'
 import axios from 'axios'
@@ -28,24 +31,33 @@ export default {
         Todos,
         AddTodo
     },
+    created(){
+        this.getUser()
+        this.fetchList()
+        this.doToast('info', 'If Page is not Loading, Please refresh the page' , 'Important')
+    },
     data(){
         return {
-            isEdit: false
+            isEdit: false,
+            userprofile: null,
+            token: localStorage.getItem("user-token") || ""
         }
     },
     computed: {
         ...mapGetters(['getProjects','getProfile','getProject']),
         returnCurrentProject(){
             try {
-                if(this.getProfile.user.isMember == 1){
-                    let id = this.getProfile.user.id
+                if(this.userprofile !== null &&this.userprofile.isMember == 1){
+                    let id = this.userprofile.id
                     let projects_list = this.getProjects
                     try {
                         if(id){
                             let projects = projects_list.filter(a=>{
-                                let members = a.member_id.split(',')
-                                if(lodash.includes(members,id.toString())){
-                                    return a
+                                if(a.member_id !== null){
+                                    let members = a.member_id.split(',')
+                                    if(lodash.includes(members,id.toString())){
+                                        return a
+                                    }
                                 }
                             })[0]
                             console.log(projects,'s')
@@ -59,7 +71,7 @@ export default {
                         return false
                     }                
                 } else {
-                    let id = this.getProfile.user.id
+                    let id = this.userprofile.id
                     let projects_list = this.getProjects
                     try {
                         if(id){
@@ -80,16 +92,28 @@ export default {
                 console.log(error,'error')
                 return false
             }
-
         }
-    },
-    created(){
-        this.fetchList()
     },
     methods:{
         ...mapActions(['fetchProjects','SaveProjectToState']),
         async getUser(){
-            await this.$store.dispatch(USER_REQUEST)
+            await axios.get("http://localhost:8000/api/me",{
+            headers:{
+                'Authorization' : `Bearer ${this.token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                }
+            })
+            .then(resp => {
+                console.log(resp,'data user')
+                this.userprofile = resp.data.user
+                console.log(resp.data.user, 'USER_PROFILE')
+            }).catch(error =>{
+                return false
+                console.log(error,'getUser')
+                this.doToast('danger','Please refresh and try again.','Login Error')
+                this.show = false                   
+            }) 
         },
         async fetchList(){
             let id = this.getProfile.user.id

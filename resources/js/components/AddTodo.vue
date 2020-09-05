@@ -38,6 +38,7 @@ export default {
         returnUserOptions(){
             try {
                 let project = this.getProject
+                if(project == null) return []
                 let members = project.member_id !== null ? project.member_id.split(',') : []
                 if(this.disabled){
                     let index = lodash.findIndex(members,a=> {return a == this.getProfile.user.id.toString()})

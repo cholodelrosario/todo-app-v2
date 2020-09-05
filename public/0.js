@@ -80,6 +80,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
       try {
         var project = this.getProject;
+        if (project == null) return [];
         var members = project.member_id !== null ? project.member_id.split(',') : [];
 
         if (this.disabled) {
@@ -476,10 +477,12 @@ var sri = __webpack_require__(/*! simple-random-id */ "./node_modules/simple-ran
                 }
 
                 projects = projects_list.filter(function (a) {
-                  var members = a.member_id.split(',');
+                  if (a.member_id !== null) {
+                    var members = a.member_id.split(',');
 
-                  if (lodash__WEBPACK_IMPORTED_MODULE_3___default.a.includes(members, id.toString())) {
-                    return a;
+                    if (lodash__WEBPACK_IMPORTED_MODULE_3___default.a.includes(members, id.toString())) {
+                      return a;
+                    }
                   }
                 })[0];
                 console.log(projects, 's');
@@ -592,12 +595,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var _components_Todos__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/Todos */ "./resources/js/components/Todos.vue");
-/* harmony import */ var _components_AddTodo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/AddTodo */ "./resources/js/components/AddTodo.vue");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _store_actions_user__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../store/actions/user */ "./resources/js/store/actions/user.js");
+/* harmony import */ var _components_Todos__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/Todos */ "./resources/js/components/Todos.vue");
+/* harmony import */ var _components_AddTodo__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/AddTodo */ "./resources/js/components/AddTodo.vue");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_6__);
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -628,6 +632,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+
 
 
 
@@ -635,28 +642,37 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    Todos: _components_Todos__WEBPACK_IMPORTED_MODULE_2__["default"],
-    AddTodo: _components_AddTodo__WEBPACK_IMPORTED_MODULE_3__["default"]
+    Todos: _components_Todos__WEBPACK_IMPORTED_MODULE_3__["default"],
+    AddTodo: _components_AddTodo__WEBPACK_IMPORTED_MODULE_4__["default"]
+  },
+  created: function created() {
+    this.getUser();
+    this.fetchList();
+    this.doToast('info', 'If Page is not Loading, Please refresh the page', 'Important');
   },
   data: function data() {
     return {
-      isEdit: false
+      isEdit: false,
+      userprofile: null,
+      token: localStorage.getItem("user-token") || ""
     };
   },
   computed: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapGetters"])(['getProjects', 'getProfile', 'getProject'])), {}, {
     returnCurrentProject: function returnCurrentProject() {
       try {
-        if (this.getProfile.user.isMember == 1) {
-          var id = this.getProfile.user.id;
+        if (this.userprofile !== null && this.userprofile.isMember == 1) {
+          var id = this.userprofile.id;
           var projects_list = this.getProjects;
 
           try {
             if (id) {
               var projects = projects_list.filter(function (a) {
-                var members = a.member_id.split(',');
+                if (a.member_id !== null) {
+                  var members = a.member_id.split(',');
 
-                if (lodash__WEBPACK_IMPORTED_MODULE_5___default.a.includes(members, id.toString())) {
-                  return a;
+                  if (lodash__WEBPACK_IMPORTED_MODULE_6___default.a.includes(members, id.toString())) {
+                    return a;
+                  }
                 }
               })[0];
               console.log(projects, 's');
@@ -670,7 +686,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             return false;
           }
         } else {
-          var _id = this.getProfile.user.id;
+          var _id = this.userprofile.id;
           var _projects_list = this.getProjects;
 
           try {
@@ -695,9 +711,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     }
   }),
-  created: function created() {
-    this.fetchList();
-  },
   methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapActions"])(['fetchProjects', 'SaveProjectToState'])), {}, {
     getUser: function getUser() {
       var _this = this;
@@ -708,7 +721,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _this.$store.dispatch(USER_REQUEST);
+                return axios__WEBPACK_IMPORTED_MODULE_5___default.a.get("http://localhost:8000/api/me", {
+                  headers: {
+                    'Authorization': "Bearer ".concat(_this.token),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  }
+                }).then(function (resp) {
+                  console.log(resp, 'data user');
+                  _this.userprofile = resp.data.user;
+                  console.log(resp.data.user, 'USER_PROFILE');
+                })["catch"](function (error) {
+                  return false;
+                  console.log(error, 'getUser');
+
+                  _this.doToast('danger', 'Please refresh and try again.', 'Login Error');
+
+                  _this.show = false;
+                });
 
               case 2:
               case "end":
@@ -782,7 +812,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _context3.prev = 5;
                 project.title = e.target.value;
                 _context3.next = 9;
-                return axios__WEBPACK_IMPORTED_MODULE_4___default.a.put("http://localhost:8000/api/projects/".concat(project.id), project, {
+                return axios__WEBPACK_IMPORTED_MODULE_5___default.a.put("http://localhost:8000/api/projects/".concat(project.id), project, {
                   headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
@@ -1260,75 +1290,81 @@ var render = function() {
     "b-container",
     { staticClass: "align-center p-4 todo-container", attrs: { fluid: "md" } },
     [
-      _vm.isEdit == false
-        ? _c("div", [
-            _c(
-              "h1",
-              {
-                directives: [
+      _c(
+        "div",
+        [
+          _vm.isEdit == false
+            ? _c("div", [
+                _c(
+                  "h1",
                   {
-                    name: "show",
-                    rawName: "v-show",
-                    value: _vm.returnCurrentProject,
-                    expression: "returnCurrentProject"
-                  }
-                ],
-                staticClass: "text-info mt-4 edit-text",
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.returnCurrentProject,
+                        expression: "returnCurrentProject"
+                      }
+                    ],
+                    staticClass: "text-info mt-4 edit-text",
+                    on: {
+                      dblclick: function($event) {
+                        _vm.isEdit = true
+                      }
+                    }
+                  },
+                  [_vm._v(_vm._s(_vm.returnCurrentProject.title))]
+                )
+              ])
+            : _c("b-form-textarea", {
+                staticClass: "form-control mb-2",
+                attrs: { size: "md", autofocus: "" },
                 on: {
-                  dblclick: function($event) {
-                    _vm.isEdit = true
+                  keyup: function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                    ) {
+                      return null
+                    }
+                    return _vm.onEnterList($event)
                   }
+                },
+                model: {
+                  value: _vm.returnCurrentProject.title,
+                  callback: function($$v) {
+                    _vm.$set(_vm.returnCurrentProject, "title", $$v)
+                  },
+                  expression: "returnCurrentProject.title"
                 }
-              },
-              [_vm._v(_vm._s(_vm.returnCurrentProject.title))]
-            )
-          ])
-        : _c("b-form-textarea", {
-            staticClass: "form-control mb-2",
-            attrs: { size: "md", autofocus: "" },
-            on: {
-              keyup: function($event) {
-                if (
-                  !$event.type.indexOf("key") &&
-                  _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                ) {
-                  return null
+              }),
+          _vm._v(" "),
+          _c(
+            "b-button",
+            {
+              directives: [
+                {
+                  name: "clipboard",
+                  rawName: "v-clipboard",
+                  value: _vm.returnCurrentProject.project_id.toString(),
+                  expression: "returnCurrentProject.project_id.toString()"
                 }
-                return _vm.onEnterList($event)
+              ],
+              attrs: { variant: "light", size: "sm" },
+              on: {
+                click: function($event) {
+                  return _vm.doToast(
+                    "success",
+                    "You can now let you teammates join the projects.",
+                    "Copied Project ID"
+                  )
+                }
               }
             },
-            model: {
-              value: _vm.returnCurrentProject.title,
-              callback: function($$v) {
-                _vm.$set(_vm.returnCurrentProject, "title", $$v)
-              },
-              expression: "returnCurrentProject.title"
-            }
-          }),
-      _vm._v(" "),
-      _c(
-        "b-button",
-        {
-          directives: [
-            {
-              name: "clipboard",
-              rawName: "v-clipboard",
-              value: _vm.returnCurrentProject.project_id.toString(),
-              expression: "returnCurrentProject.project_id.toString()"
-            }
-          ],
-          attrs: { variant: "light", size: "sm" },
-          on: {
-            click: function($event) {
-              return _vm.doToast(
-                "success",
-                "You can now let you teammates join the projects.",
-                "Copied Project ID"
-              )
-            }
-          }
-        },
-        [_vm._v("\n    Copy Project ID\n    ")]
+            [_vm._v("\n    Copy Project ID\n    ")]
+          )
+        ],
+        1
       ),
       _vm._v(" "),
       _c("AddTodo"),

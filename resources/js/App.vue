@@ -13,6 +13,7 @@
 import Header from './components/Header'
 import { USER_REQUEST } from "./store/actions/user";
 import axios from 'axios'
+import { mapGetters } from 'vuex';
 
 export default {
     components:{
@@ -36,12 +37,11 @@ export default {
 
         }
     },
+    computed: mapGetters(['getProfile']),
     methods:{
+        
         async getUser(){
             await this.$store.dispatch(USER_REQUEST)
-            .then(() => {
-                console.log('user gotcha')
-            })  
         }        
     }
 }
