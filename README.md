@@ -58,9 +58,8 @@ As much as possible, I tried to have my code simple and have it modular by using
 
 ----
 #### Few Notes
-  - You may have to refresh the pages multiple times every time you login. 
+  - You may have to refresh the pages multiple times for the API's to load. 
   - Thank you and have a great day :) 
-
 
 
 Cholo Miguel Del Rosario
